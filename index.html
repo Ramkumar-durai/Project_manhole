@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tamil Nadu Government - Manhole Detection System</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --tn-govt-red: #d82b2b;
+        --tn-govt-yellow: #f7c32e;
+        --tn-govt-black: #000000;
+        --tn-govt-white: #ffffff;
+        --tn-govt-blue: #1e3a8a;
+        --tn-govt-orange: #f97316;
+        --tn-govt-green: #16a34a;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f5f5f5;
+        background-image: url("https://www.tn.gov.in/sites/all/themes/eminent/images/bg.png");
+        background-attachment: fixed;
+        color: #333;
+      }
+
+      .header {
+        background: linear-gradient(
+          135deg,
+          var(--tn-govt-red) 0%,
+          #a51c1c 100%
+        );
+        color: var(--tn-govt-white);
+        padding: 15px 0;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        border-bottom: 4px solid var(--tn-govt-yellow);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: repeating-linear-gradient(
+          45deg,
+          var(--tn-govt-yellow),
+          var(--tn-govt-yellow) 10px,
+          var(--tn-govt-red) 10px,
+          var(--tn-govt-red) 20px
+        );
+      }
+
+      .header h1 {
+        margin: 0;
+        font-size: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+      }
+
+      .header h1 img {
+        height: 40px;
+        margin-right: 15px;
+        filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.3));
+      }
+
+      .header p {
+        margin: 5px 0 0;
+        font-size: 16px;
+        font-weight: 300;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 30px auto;
+        background-color: rgba(255, 255, 255, 0.95);
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+        border-top: 5px solid var(--tn-govt-yellow);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .container::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: repeating-linear-gradient(
+          to right,
+          var(--tn-govt-red),
+          var(--tn-govt-red) 20px,
+          var(--tn-govt-yellow) 20px,
+          var(--tn-govt-yellow) 40px
+        );
+      }
+
+      .video-container {
+        position: relative;
+        margin-bottom: 25px;
+        border: 3px solid var(--tn-govt-red);
+        border-radius: 8px;
+        overflow: hidden;
+        height: 480px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      #videoFeed {
+        width: 100%;
+        height: 100%;
+        background-color: #000;
+        display: block;
+        object-fit: cover;
+      }
+
+      #canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 10;
+      }
+
+      .controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        padding: 18px;
+        background: linear-gradient(to right, #f8f8f8, #f0f0f0);
+        border-radius: 8px;
+        border-left: 5px solid var(--tn-govt-red);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .button-group button {
+        padding: 12px 24px;
+        margin: 0 8px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+      }
+
+      .button-group button i {
+        margin-right: 8px;
+      }
+
+      #startBtn {
+        background: linear-gradient(to bottom, var(--tn-govt-green), #138a3a);
+        color: white;
+      }
+
+      #startBtn:hover {
+        background: linear-gradient(to bottom, #138a3a, #0d6e2f);
+        transform: translateY(-2px);
+      }
+
+      #stopBtn {
+        background: linear-gradient(to bottom, var(--tn-govt-red), #a51c1c);
+        color: white;
+      }
+
+      #stopBtn:hover {
+        background: linear-gradient(to bottom, #a51c1c, #7e1515);
+        transform: translateY(-2px);
+      }
+
+      #captureBtn {
+        background: linear-gradient(to bottom, var(--tn-govt-yellow), #e0b328);
+        color: var(--tn-govt-black);
+      }
+
+      #captureBtn:hover {
+        background: linear-gradient(to bottom, #e0b328, #c79e22);
+        transform: translateY(-2px);
+      }
+
+      #dashboardBtn {
+        background: linear-gradient(to bottom, var(--tn-govt-blue), #152c6e);
+        color: white;
+        padding: 12px 28px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      #dashboardBtn:hover {
+        background: linear-gradient(to bottom, #152c6e, #0e1f4d);
+        transform: translateY(-2px);
+      }
+
+      #dashboardBtn i {
+        margin-left: 10px;
+        transition: transform 0.3s ease;
+      }
+
+      #dashboardBtn:hover i {
+        transform: translateX(3px);
+      }
+
+      .detection-info {
+        background: linear-gradient(to right, #f8f8f8, #f0f0f0);
+        padding: 20px;
+        border-radius: 8px;
+        margin-top: 25px;
+        border-left: 5px solid var(--tn-govt-red);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .detection-info h2 {
+        margin-top: 0;
+        color: var(--tn-govt-red);
+        display: flex;
+        align-items: center;
+        border-bottom: 2px solid #ddd;
+        padding-bottom: 10px;
+      }
+
+      .detection-info h2 i {
+        margin-right: 10px;
+        color: var(--tn-govt-blue);
+      }
+
+      .detection-item {
+        margin-bottom: 15px;
+        padding: 15px;
+        background-color: white;
+        border-radius: 6px;
+        border-left: 4px solid var(--tn-govt-yellow);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s ease;
+      }
+
+      .detection-item:hover {
+        transform: translateX(5px);
+      }
+
+      .detection-item p {
+        margin: 8px 0;
+        display: flex;
+        align-items: center;
+      }
+
+      .detection-item strong {
+        min-width: 120px;
+        display: inline-block;
+      }
+
+      .detection-item i {
+        margin-right: 10px;
+        width: 20px;
+        text-align: center;
+        color: var(--tn-govt-blue);
+      }
+
+      .loading-overlay {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        z-index: 20;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        font-size: 20px;
+        flex-direction: column;
+      }
+
+      .spinner {
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid var(--tn-govt-yellow);
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .footer {
+        text-align: center;
+        padding: 25px 15px;
+        background: linear-gradient(135deg, var(--tn-govt-black) 0%, #333 100%);
+        color: var(--tn-govt-white);
+        margin-top: 40px;
+        font-size: 14px;
+        border-top: 3px solid var(--tn-govt-yellow);
+        position: relative;
+      }
+
+      .footer::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: repeating-linear-gradient(
+          45deg,
+          var(--tn-govt-yellow),
+          var(--tn-govt-yellow) 10px,
+          var(--tn-govt-black) 10px,
+          var(--tn-govt-black) 20px
+        );
+      }
+
+      .footer a {
+        color: var(--tn-govt-yellow);
+        text-decoration: none;
+        transition: color 0.3s ease;
+      }
+
+      .footer a:hover {
+        color: white;
+        text-decoration: underline;
+      }
+
+      .tn-govt-badge {
+        background-color: var(--tn-govt-yellow);
+        color: var(--tn-govt-black);
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: bold;
+        display: inline-block;
+        margin-left: 15px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .status-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 13px;
+        display: inline-flex;
+        align-items: center;
+      }
+
+      .status-badge i {
+        margin-right: 5px;
+      }
+
+      .status-active {
+        background: linear-gradient(to right, var(--tn-govt-green), #138a3a);
+        color: white;
+      }
+
+      .status-warning {
+        background: linear-gradient(to right, var(--tn-govt-orange), #e06a10);
+        color: white;
+      }
+
+      .status-danger {
+        background: linear-gradient(to right, var(--tn-govt-red), #a51c1c);
+        color: white;
+      }
+
+      /* Indian pattern decoration */
+      .indian-pattern {
+        position: absolute;
+        width: 150px;
+        height: 150px;
+        opacity: 0.1;
+        z-index: 0;
+      }
+
+      .pattern-1 {
+        top: 20px;
+        right: 20px;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="%23d82b2b" d="M50 0L100 50L50 100L0 50Z"/></svg>');
+        background-repeat: no-repeat;
+        background-size: contain;
+      }
+
+      .pattern-2 {
+        bottom: 20px;
+        left: 20px;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle fill="%23f7c32e" cx="50" cy="50" r="40"/></svg>');
+        background-repeat: no-repeat;
+        background-size: contain;
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 768px) {
+        .header h1 {
+          font-size: 22px;
+          flex-direction: column;
+        }
+
+        .header h1 img {
+          margin-right: 0;
+          margin-bottom: 10px;
+        }
+
+        .tn-govt-badge {
+          margin-left: 0;
+          margin-top: 8px;
+        }
+
+        .controls {
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        .button-group {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+
+        .button-group button {
+          margin: 5px;
+          padding: 10px 15px;
+        }
+
+        #dashboardBtn {
+          width: 100%;
+          justify-content: center;
+        }
+
+        .video-container {
+          height: 350px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>
+        <img src="//www.tn.gov.in/sites/all/themes/eminent/logo.png" alt="" />
+        Tamil Nadu Municipal Corporation
+        <span class="tn-govt-badge">Official</span>
+      </h1>
+      <p>Smart City Initiative - AI Powered Manhole Detection System</p>
+    </div>
+
+    <div class="container">
+      <div class="indian-pattern pattern-1"></div>
+      <div class="indian-pattern pattern-2"></div>
+
+      <div class="video-container">
+        <video id="videoFeed" autoplay></video>
+        <canvas id="canvas"></canvas>
+        <div class="loading-overlay" id="loadingOverlay">
+          <div class="spinner"></div>
+          <span>Processing YOLOv8 Detection...</span>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="button-group">
+          <button id="startBtn">
+            <i class="fas fa-play"></i> Start Camera
+          </button>
+          <button id="stopBtn"><i class="fas fa-stop"></i> Stop Camera</button>
+          <button id="captureBtn">
+            <i class="fas fa-camera"></i> Capture & Detect
+          </button>
+        </div>
+        <button id="dashboardBtn" onclick="redirectToDashboard()">
+          View Full Status <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+
+      <div class="detection-info">
+        <h2><i class="fas fa-list-alt"></i> Detection Results</h2>
+        <div id="detectionResults">
+          <div class="detection-item">
+            <p>
+              <strong><i class="fas fa-info-circle"></i> Instructions:</strong>
+              Start camera and capture to detect manholes
+            </p>
+            <p>
+              <i class="fas fa-lightbulb"></i> Open manholes will be marked in
+              red, covered ones in green
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>
+        © 2025 Tamil Nadu Municipal Corporation. All Rights Reserved. |
+        <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a>
+      </p>
+      <p>
+        For technical support, contact:
+        <a href="mailto:support.mhc@tn.gov.in">support.mhc@tn.gov.in</a> |
+        Toll-free: <a href="tel:18004255333">1800 425 5333</a>
+      </p>
+      <p>Powered by YOLOv8 Computer Vision Technology</p>
+      <p>
+        <small
+          >System Status:
+          <span class="status-badge status-active"
+            ><i class="fas fa-check-circle"></i> Online</span
+          >
+          | Last Updated:
+          <script>
+            document.write(
+              new Date().toLocaleDateString("en-IN", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })
+            );
+          </script>
+        </small>
+      </p>
+      <div style="margin-top: 15px">
+        <img
+          src="https://www.tn.gov.in/sites/all/themes/eminent/images/digital-india.png"
+          alt="Digital India"
+          height="40"
+          style="margin: 0 10px"
+        />
+        <img
+          src="https://www.tn.gov.in/sites/all/themes/eminent/images/make-in-india.png"
+          alt="Make in India"
+          height="40"
+          style="margin: 0 10px"
+        />
+      </div>
+    </div>
+
+    <script>
+      // DOM Elements
+      const videoElement = document.getElementById("videoFeed");
+      const canvasElement = document.getElementById("canvas");
+      const startBtn = document.getElementById("startBtn");
+      const stopBtn = document.getElementById("stopBtn");
+      const captureBtn = document.getElementById("captureBtn");
+      const loadingOverlay = document.getElementById("loadingOverlay");
+      const detectionResults = document.getElementById("detectionResults");
+
+      // Canvas context
+      const canvasCtx = canvasElement.getContext("2d");
+
+      // Stream reference
+      let stream = null;
+
+      // Initialize webcam
+      async function startWebcam() {
+        try {
+          // Show loading state
+          startBtn.innerHTML =
+            '<i class="fas fa-spinner fa-spin"></i> Starting...';
+          startBtn.disabled = true;
+
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+              width: { ideal: 1280 },
+              height: { ideal: 720 },
+              facingMode: "environment",
+            },
+          });
+
+          videoElement.srcObject = stream;
+          videoElement.onloadedmetadata = () => {
+            canvasElement.width = videoElement.clientWidth;
+            canvasElement.height = videoElement.clientHeight;
+          };
+
+          startBtn.innerHTML = '<i class="fas fa-play"></i> Start Camera';
+          stopBtn.disabled = false;
+          captureBtn.disabled = false;
+
+          detectionResults.innerHTML = `
+            <div class="detection-item">
+              <p><i class="fas fa-check-circle"></i> Camera activated successfully</p>
+              <p><i class="fas fa-lightbulb"></i> Press "Capture & Detect" to analyze the frame</p>
+            </div>
+          `;
+        } catch (error) {
+          console.error("Error accessing webcam:", error);
+          startBtn.innerHTML = '<i class="fas fa-play"></i> Start Camera';
+          startBtn.disabled = false;
+
+          detectionResults.innerHTML = `
+            <div class="detection-item" style="border-left-color: var(--tn-govt-red);">
+              <p><i class="fas fa-exclamation-triangle"></i> Error accessing webcam: ${error.message}</p>
+              <p><i class="fas fa-info-circle"></i> Please ensure camera permissions are granted</p>
+            </div>
+          `;
+        }
+      }
+
+      // Stop webcam
+      function stopWebcam() {
+        if (stream) {
+          stream.getTracks().forEach((track) => track.stop());
+          videoElement.srcObject = null;
+          canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
+          startBtn.disabled = false;
+          stopBtn.disabled = true;
+          captureBtn.disabled = true;
+
+          detectionResults.innerHTML = `
+            <div class="detection-item">
+              <p><i class="fas fa-info-circle"></i> Camera stopped</p>
+              <p><i class="fas fa-lightbulb"></i> Press "Start Camera" to begin detection</p>
+            </div>
+          `;
+        }
+      }
+
+      // Capture frame and send for detection
+      function captureAndDetect() {
+        if (!stream) {
+          detectionResults.innerHTML = `
+            <div class="detection-item" style="border-left-color: var(--tn-govt-red);">
+              <p><i class="fas fa-exclamation-triangle"></i> Camera is not active</p>
+              <p><i class="fas fa-info-circle"></i> Please start the camera first</p>
+            </div>
+          `;
+          return;
+        }
+
+        // Show loading overlay
+        loadingOverlay.style.display = "flex";
+        captureBtn.innerHTML =
+          '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        captureBtn.disabled = true;
+
+        // Draw current video frame to canvas
+        canvasCtx.drawImage(
+          videoElement,
+          0,
+          0,
+          canvasElement.width,
+          canvasElement.height
+        );
+
+        // Simulate detection after delay
+        setTimeout(() => {
+          const mockDetections = [
+            {
+              bbox: [120, 240, 350, 380],
+              confidence: 0.94,
+              class: "open_manhole",
+            },
+            {
+              bbox: [500, 300, 620, 420],
+              confidence: 0.87,
+              class: "covered_manhole",
+            },
+          ];
+
+          loadingOverlay.style.display = "none";
+          captureBtn.innerHTML =
+            '<i class="fas fa-camera"></i> Capture & Detect';
+          captureBtn.disabled = false;
+
+          drawDetections(mockDetections);
+          updateDetectionResults(mockDetections);
+        }, 2000);
+      }
+
+      // Draw bounding boxes on canvas
+      function drawDetections(detections) {
+        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+        canvasCtx.drawImage(
+          videoElement,
+          0,
+          0,
+          canvasElement.width,
+          canvasElement.height
+        );
+
+        detections.forEach((det) => {
+          const [x, y, width, height] = det.bbox;
+          const isOpen = det.class === "open_manhole";
+
+          // Draw rectangle
+          canvasCtx.strokeStyle = isOpen ? "#ff0000" : "#00aa00";
+          canvasCtx.lineWidth = 3;
+          canvasCtx.strokeRect(x, y, width - x, height - y);
+
+          // Fill with semi-transparent color
+          canvasCtx.fillStyle = isOpen
+            ? "rgba(255, 0, 0, 0.2)"
+            : "rgba(0, 170, 0, 0.2)";
+          canvasCtx.fillRect(x, y, width - x, height - y);
+
+          // Draw label background
+          canvasCtx.fillStyle = isOpen ? "#ff0000" : "#00aa00";
+          canvasCtx.fillRect(
+            x - 2,
+            y - 25,
+            canvasCtx.measureText(
+              `${det.class} (${(det.confidence * 100).toFixed(0)}%)`
+            ).width + 10,
+            25
+          );
+
+          // Draw label text
+          canvasCtx.font = "bold 14px Poppins";
+          canvasCtx.fillStyle = "white";
+          canvasCtx.fillText(
+            `${det.class.replace("_", " ")} (${(det.confidence * 100).toFixed(
+              0
+            )}%)`,
+            x + 3,
+            y - 8
+          );
+        });
+      }
+
+      // Update detection results in HTML
+      function updateDetectionResults(detections) {
+        if (detections.length === 0) {
+          detectionResults.innerHTML = `
+            <div class="detection-item">
+              <p><i class="fas fa-info-circle"></i> No manholes detected in current frame</p>
+            </div>
+          `;
+          return;
+        }
+
+        let resultsHTML = "";
+
+        detections.forEach((det) => {
+          const isOpen = det.class === "open_manhole";
+          const statusClass = isOpen ? "status-danger" : "status-active";
+          const statusIcon = isOpen ? "exclamation-triangle" : "check-circle";
+          const statusText = isOpen
+            ? "DANGEROUS - OPEN MANHOLE"
+            : "SAFE - COVERED";
+
+          resultsHTML += `
+            <div class="detection-item">
+              <p><strong><i class="fas fa-map-marker-alt"></i> Location:</strong> Coordinates (${det.bbox.join(
+                ", "
+              )})</p>
+              <p><strong><i class="fas fa-percentage"></i> Confidence:</strong> ${(
+                det.confidence * 100
+              ).toFixed(1)}%</p>
+              <p><strong><i class="fas fa-${statusIcon}"></i> Status:</strong> 
+                <span class="status-badge ${statusClass}"><i class="fas fa-${statusIcon}"></i> ${statusText}</span>
+              </p>
+              <p><strong><i class="fas fa-clock"></i> Detected:</strong> ${new Date().toLocaleTimeString(
+                "en-IN"
+              )}</p>
+              ${
+                isOpen
+                  ? '<p><i class="fas fa-bell"></i> <strong>Alert:</strong> Immediate attention required for open manhole</p>'
+                  : ""
+              }
+            </div>
+          `;
+        });
+
+        detectionResults.innerHTML = resultsHTML;
+      }
+
+      // Redirect to dashboard
+      function redirectToDashboard() {
+        window.location.href = "dashboard.html";
+      }
+
+      // Event listeners
+      startBtn.addEventListener("click", startWebcam);
+      stopBtn.addEventListener("click", stopWebcam);
+      captureBtn.addEventListener("click", captureAndDetect);
+
+      // Initialize
+      window.onload = () => {
+        stopBtn.disabled = true;
+        captureBtn.disabled = true;
+
+        // Set current date in Indian format
+        const dateElements = document.querySelectorAll(".current-date");
+        dateElements.forEach((el) => {
+          el.textContent = new Date().toLocaleDateString("en-IN", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          });
+        });
+      };
+    </script>
+  </body>
+</html>
